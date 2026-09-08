@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "source": "USPS Notice 123 (Postal Explorer), effective 2026-07-12",
+    "source_url": "https://pe.usps.com/text/dmm300/Notice123.htm",
+    "fetched": "2026-09-06",
+    "notes": "USPS retail counter rates. Sellers using eBay-purchased or third-party discounted labels typically pay less than these retail prices, especially for Ground Advantage and Priority Mail -- treat these as an upper-bound estimate, not what you'll actually be charged at checkout. UPS and FedEx are not modeled with real rate tables (their retail/account rates vary too much by dimensional weight, account discounts, and fuel surcharges to responsibly hardcode) -- they're listed as pointers to get a real quote, not computed estimates."
+  },
+  "zones": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "services": {
+    "usps_ground_advantage": {
+      "label": "USPS Ground Advantage",
+      "kind": "zone_weight",
+      "weight_brackets_lb": [1, 2, 3, 5, 10],
+      "rates_by_zone": {
+        "1": [9.55, 10.80, 11.30, 12.95, 15.95],
+        "2": [9.55, 10.80, 11.30, 12.95, 15.95],
+        "3": [9.95, 11.50, 12.00, 13.55, 16.30],
+        "4": [10.20, 12.20, 12.65, 14.55, 17.25],
+        "5": [10.60, 13.00, 13.70, 15.80, 19.40],
+        "6": [10.95, 14.10, 14.95, 17.45, 22.85],
+        "7": [11.35, 15.10, 16.45, 19.60, 27.50],
+        "8": [11.95, 16.45, 18.95, 22.40, 33.30],
+        "9": [12.90, 19.05, 22.40, 26.05, 39.45]
+      }
+    },
+    "usps_priority_mail": {
+      "label": "USPS Priority Mail (by weight, not flat rate)",
+      "kind": "zone_weight",
+      "weight_brackets_lb": [1, 2, 3, 5, 10],
+      "rates_by_zone": {
+        "1": [11.00, 11.95, 12.45, 14.30, 17.80],
+        "2": [11.50, 12.65, 13.30, 14.95, 18.25],
+        "4": [11.90, 14.35, 15.15, 17.50, 21.75],
+        "5": [13.05, 16.85, 18.05, 22.10, 28.65],
+        "8": [16.95, 21.55, 27.10, 36.90, 61.30],
+        "9": [34.25, 42.40, 53.45, 73.00, 121.55]
+      },
+      "note": "Zones 3, 6, and 7 weren't in the source table fetched -- pick the nearest zone above/below as a rough stand-in."
+    },
+    "usps_priority_flat_rate_envelope": {
+      "label": "USPS Priority Mail Flat Rate Envelope",
+      "kind": "flat",
+      "price": 12.90
+    },
+    "usps_priority_flat_rate_legal_envelope": {
+      "label": "USPS Priority Mail Legal Flat Rate Envelope",
+      "kind": "flat",
+      "price": 13.25
+    },
+    "usps_priority_flat_rate_padded_envelope": {
+      "label": "USPS Priority Mail Padded Flat Rate Envelope",
+      "kind": "flat",
+      "price": 14.00
+    },
+    "usps_priority_flat_rate_small_box": {
+      "label": "USPS Priority Mail Small Flat Rate Box",
+      "kind": "flat",
+      "price": 13.65
+    },
+    "usps_priority_flat_rate_medium_box": {
+      "label": "USPS Priority Mail Medium Flat Rate Box",
+      "kind": "flat",
+      "price": 24.80
+    },
+    "usps_priority_flat_rate_large_box": {
+      "label": "USPS Priority Mail Large Flat Rate Box",
+      "kind": "flat",
+      "price": 34.00
+    },
+    "usps_media_mail": {
+      "label": "USPS Media Mail (books, CDs, DVDs -- eligible media only)",
+      "kind": "weight_only",
+      "weight_brackets_lb": [1, 2, 5, 10],
+      "rates": [4.39, 5.13, 7.34, 11.02]
+    },
+    "ups_ground": {
+      "label": "UPS Ground",
+      "kind": "estimate_only",
+      "note": "UPS Ground retail rates for a 1 lb package commonly run roughly $12-$16 depending on zone, with steep increases by weight and dimensional weight -- not precise enough to hardcode responsibly. Get a real quote at ups.com or from whatever label provider you use."
+    },
+    "fedex_home_delivery": {
+      "label": "FedEx Home Delivery / Ground",
+      "kind": "estimate_only",
+      "note": "FedEx Ground/Home Delivery pricing is account- and dimension-dependent, similar to UPS. Get a real quote at fedex.com or from whatever label provider you use."
+    }
+  }
+}

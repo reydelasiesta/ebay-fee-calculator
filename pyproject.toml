@@ -1,0 +1,20 @@
+[project]
+name = "ebay-fee-calculator"
+version = "0.1.0"
+description = "Self-hosted eBay fee/profit calculator with a weekly fee-schedule verification check"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "apscheduler>=3.10",
+    "requests>=2.32",
+    "beautifulsoup4>=4.12",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

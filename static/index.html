@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eBay Fee &amp; Profit Calculator</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #0f1115;
+    --panel: #1a1d24;
+    --border: #2c303a;
+    --text: #e8e9ec;
+    --muted: #9aa0ab;
+    --accent: #3ddc84;
+    --danger: #ff6b6b;
+    --warn: #ffb84d;
+    --info: #6ab4ff;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f5f7;
+      --panel: #ffffff;
+      --border: #dcdfe4;
+      --text: #1a1d24;
+      --muted: #5b6270;
+      --accent: #1f9d5c;
+      --danger: #c9302c;
+      --warn: #b96b00;
+      --info: #1a5fb4;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  h2.card-title { font-size: 1rem; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin-bottom: 20px; font-size: 0.9rem; }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 420px) minmax(280px, 380px) minmax(280px, 440px);
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 1180px) { .layout { grid-template-columns: minmax(300px, 420px) minmax(280px, 380px); } .col-glossary { grid-column: 1 / -1; } }
+  @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } .col-glossary { grid-column: auto; } }
+  .col { display: flex; flex-direction: column; gap: 20px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  label { display: block; font-size: 0.85rem; margin: 12px 0 4px; color: var(--muted); }
+  input, select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .row { display: flex; gap: 12px; }
+  .row > div { flex: 1; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+  .checkbox-row input { width: auto; }
+  .checkbox-row label { margin: 0; color: var(--text); font-size: 0.9rem; }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: #06110a;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    margin-top: 12px;
+  }
+  .result-line { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
+  .result-line.total { font-weight: 700; border-bottom: none; margin-top: 6px; font-size: 1.05rem; }
+  .profit-positive { color: var(--accent); }
+  .profit-negative { color: var(--danger); }
+  .note { font-size: 0.8rem; color: var(--muted); margin-top: 14px; line-height: 1.4; }
+  .banner {
+    background: rgba(255, 184, 77, 0.12);
+    border: 1px solid var(--warn);
+    color: var(--warn);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+    display: none;
+  }
+  .estimate-flag { color: var(--warn); font-size: 0.8rem; margin-top: 8px; }
+  .ship-result {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(106, 180, 255, 0.1);
+    border: 1px solid var(--info);
+    font-size: 0.88rem;
+    display: none;
+  }
+  .ship-result .price { font-size: 1.2rem; font-weight: 700; color: var(--info); }
+  details.glossary-item { border-bottom: 1px solid var(--border); padding: 8px 0; }
+  details.glossary-item:last-child { border-bottom: none; }
+  details.glossary-item summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+  details.glossary-item p { margin: 8px 0 2px; font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .gotcha-list { padding-left: 18px; margin: 0; }
+  .gotcha-list li { font-size: 0.85rem; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .subhead { font-size: 0.85rem; font-weight: 700; margin: 18px 0 8px; color: var(--text); }
+  .subhead:first-child { margin-top: 0; }
+</style>
+</head>
+<body>
+<h1>eBay Fee &amp; Profit Calculator</h1>
+<div class="sub" id="lastVerified">Loading fee schedule…</div>
+<div class="banner" id="staleBanner"></div>
+
+<div class="layout">
+  <div class="col">
+    <div class="panel">
+      <label for="category">Category</label>
+      <select id="category"></select>
+
+      <label for="storeTier">Store subscription</label>
+      <select id="storeTier"></select>
+
+      <div class="row">
+        <div>
+          <label for="salePrice">Sale price ($)</label>
+          <input type="number" id="salePrice" step="0.01" value="0">
+        </div>
+        <div>
+          <label for="shippingCharged">Shipping charged to buyer ($)</label>
+          <input type="number" id="shippingCharged" step="0.01" value="0">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="itemCost">Item cost / COGS ($)</label>
+          <input type="number" id="itemCost" step="0.01" value="0">
+        </div>
+        <div>
+          <label for="shippingCost">Your actual shipping cost ($)</label>
+          <input type="number" id="shippingCost" step="0.01" value="0">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="otherCosts">Other costs ($) — packaging, supplies, etc.</label>
+          <input type="number" id="otherCosts" step="0.01" value="0">
+        </div>
+        <div>
+          <label for="insertionFee">Insertion fee, if any ($)</label>
+          <input type="number" id="insertionFee" step="0.01" value="0">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="promotedPct">Promoted Listings ad rate (%)</label>
+          <input type="number" id="promotedPct" step="0.1" value="0">
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="isInternational">
+        <label for="isInternational">International buyer (adds international fee)</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="belowStandard">
+        <label for="belowStandard">Below Standard seller performance</label>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+    </div>
+
+    <div class="panel">
+      <h2 class="card-title">Shipping Cost Estimator (optional)</h2>
+      <label for="shipService">Carrier &amp; service</label>
+      <select id="shipService"></select>
+
+      <div class="row" id="zipRow" style="display:none;">
+        <div>
+          <label for="originZip">Your ship-from ZIP</label>
+          <input type="text" id="originZip" inputmode="numeric" maxlength="5" placeholder="e.g. 60601" list="originZipHistory">
+          <datalist id="originZipHistory"></datalist>
+        </div>
+        <div>
+          <label for="destZip">Buyer's ZIP</label>
+          <input type="text" id="destZip" inputmode="numeric" maxlength="5" placeholder="e.g. 90210">
+        </div>
+      </div>
+      <div class="estimate-flag" id="zoneAutoNote" style="display:none;"></div>
+
+      <div class="row" id="shipZoneRow" style="display:none;">
+        <div>
+          <label for="shipZone">USPS zone (auto-fills above, or set manually)</label>
+          <select id="shipZone"></select>
+        </div>
+      </div>
+
+      <details class="glossary-item" id="zoneHelp" style="display:none;">
+        <summary>What's my zone? (how this works)</summary>
+        <p style="margin-bottom:8px;">USPS zones aren't a fixed map of the country — each zone is the <em>distance band</em> between a specific ship-from ZIP and a specific destination ZIP. Enter both ZIPs above and this calculator queries USPS's own live "Get Zone for ZIP Code Pair" tool for that exact pair — the real answer, not an estimate, and it works for whatever ZIP you ship from (results are cached briefly so repeat lookups are instant). If you ship from more than one location, your recently-used ship-from ZIPs are remembered in this browser so you can pick from the dropdown instead of retyping.</p>
+        <svg viewBox="0 0 260 190" style="width:100%; max-width:280px; display:block; margin:0 auto;">
+          <g fill="none" stroke="currentColor" stroke-opacity="0.35">
+            <circle cx="40" cy="95" r="18"/>
+            <circle cx="40" cy="95" r="42"/>
+            <circle cx="40" cy="95" r="66"/>
+            <circle cx="40" cy="95" r="90"/>
+            <circle cx="40" cy="95" r="114"/>
+            <circle cx="40" cy="95" r="138"/>
+            <circle cx="40" cy="95" r="162"/>
+            <circle cx="40" cy="95" r="186"/>
+          </g>
+          <circle cx="40" cy="95" r="4" fill="var(--info)"/>
+          <text x="40" y="115" text-anchor="middle" font-size="9" fill="var(--muted)">you</text>
+          <g font-size="10" fill="var(--info)" text-anchor="middle" font-weight="700">
+            <text x="58" y="90">1-2</text>
+            <text x="82" y="90">3</text>
+            <text x="106" y="90">4</text>
+            <text x="130" y="90">5</text>
+            <text x="154" y="90">6</text>
+            <text x="178" y="90">7</text>
+            <text x="202" y="90">8</text>
+          </g>
+        </svg>
+        <p style="margin-top:8px;">Zone 9 (Alaska, Hawaii, and U.S. territories) isn't on this diagram — it's its own category regardless of straight-line distance. This is just illustrating the general concept (farther from you = higher zone number); the number that actually gets used comes from the live lookup above, not this picture.</p>
+        <p>Prefer to check it yourself? <strong><a href="https://postcalc.usps.com/DomesticZoneChart/Index" target="_blank" rel="noopener">USPS's official Domestic Zone Chart tool</a></strong> is the same source this calculator queries.</p>
+      </details>
+
+      <div class="row" id="shipWeightRow" style="display:none;">
+        <div>
+          <label for="shipWeight">Weight (lb)</label>
+          <input type="number" id="shipWeight" step="0.1" value="1">
+        </div>
+      </div>
+
+      <div class="ship-result" id="shipResult"></div>
+      <button class="secondary" id="applyShipBtn" style="display:none;">Apply to "Your actual shipping cost"</button>
+      <div class="note">USPS figures are retail counter rates (Notice 123, effective 2026-07-12) — eBay-purchased or third-party labels usually cost less. UPS/FedEx aren't computed here; dimensional weight and account discounts vary too much to hardcode responsibly.</div>
+    </div>
+  </div>
+
+  <div class="panel" id="resultsPanel">
+    <div class="result-line"><span>Revenue (sale + shipping charged)</span><span id="rRevenue">$0.00</span></div>
+    <div class="result-line"><span>Final value fee</span><span id="rFvf">$0.00</span></div>
+    <div class="result-line"><span>Per-order fee</span><span id="rPerOrder">$0.00</span></div>
+    <div class="result-line"><span>International fee</span><span id="rIntl">$0.00</span></div>
+    <div class="result-line"><span>Promoted Listings fee</span><span id="rPromoted">$0.00</span></div>
+    <div class="result-line"><span>Below Standard surcharge</span><span id="rSurcharge">$0.00</span></div>
+    <div class="result-line"><span>Insertion fee</span><span id="rInsertion">$0.00</span></div>
+    <div class="result-line total"><span>Total eBay fees</span><span id="rTotalFees">$0.00</span></div>
+    <div class="result-line"><span>Net proceeds</span><span id="rNet">$0.00</span></div>
+    <div class="result-line"><span>Total costs</span><span id="rCosts">$0.00</span></div>
+    <div class="result-line total"><span>Profit</span><span id="rProfit">$0.00</span></div>
+    <div class="result-line"><span>Margin</span><span id="rMargin">0%</span></div>
+    <div class="result-line"><span>ROI on item cost</span><span id="rRoi">–</span></div>
+    <div class="estimate-flag" id="estimateFlag" style="display:none;"></div>
+    <div class="note">Final value fee applies to sale price + shipping charged, per eBay's published fee structure. Below Standard surcharge is applied here as a flat +6% of order total, an approximation for a rarely-used edge case — verify against your own account status if this applies to you.</div>
+  </div>
+
+  <div class="panel col-glossary">
+    <h2 class="card-title">Explanations &amp; Key</h2>
+
+    <div class="subhead">Glossary</div>
+    <details class="glossary-item">
+      <summary>COGS / Item cost</summary>
+      <p>Cost of Goods Sold — what you originally paid to acquire the item. This is the number that goes in the "Item cost / COGS" field.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Final Value Fee (FVF)</summary>
+      <p>eBay's main selling fee — a percentage of your total sale (item price + shipping charged, and yes, sales tax too), charged only when the item actually sells. The rate depends on category and your Store tier.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Insertion Fee</summary>
+      <p>The fee to create a listing at all, charged whether or not it sells. Most sellers get up to 250 free per month; Store subscribers get more.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Per-Order Fee</summary>
+      <p>A flat add-on to the Final Value Fee: $0.30 if the order total is $10.00 or less, $0.40 if it's over $10.00.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Store Subscription (Starter/Basic/Premium/Anchor/Enterprise)</summary>
+      <p>A monthly plan that gives more free listings and, from Basic tier up, a genuinely lower Final Value Fee rate. Starter only gets the listing-allowance benefit — its fee rate is identical to having no Store at all.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Below Standard Seller Performance</summary>
+      <p>eBay evaluates your account on the 20th of each month against metrics like late shipments, cancellations, and defect rate. A "Below Standard" rating adds a 6% surcharge (7% after 4+ consecutive months) to your Final Value Fees for the <em>following</em> calendar month.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Item Not As Described (INAD) rate</summary>
+      <p>How often buyers open "item not as described" return requests against you. A "Very High" rating in a category triggers its own separate surcharge (5%, or 6% after 4+ consecutive months) — independent of the Below Standard surcharge above.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Top Rated Seller</summary>
+      <p>eBay's best performance tier. Top Rated and Above Standard sellers are exempt from the Below Standard surcharge.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Promoted Listings (Standard)</summary>
+      <p>Pay-per-sale advertising. You set an ad rate %, but it's only charged on sales eBay actually attributes to a promoted click — not on every sale you make.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>International Fee</summary>
+      <p>An extra 1.65% when the buyer or delivery address is outside the US (and you're not using eBay International Shipping). This is separate from, and in addition to, the Final Value Fee.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Currency Conversion Charge</summary>
+      <p>A 3% fee eBay keeps when it has to convert your funds between currencies on a cross-border sale. Not modeled in this calculator.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Dispute Fee</summary>
+      <p>A flat $20.00 fee if you're found responsible for a disputed amount (e.g., a chargeback), excluding sales tax, per dispute.</p>
+    </details>
+    <details class="glossary-item">
+      <summary>Margin vs. ROI</summary>
+      <p><strong>Margin</strong> = profit ÷ sale price — how much of what the buyer paid is profit. <strong>ROI</strong> = profit ÷ item cost — how much you made relative to what you spent to acquire the item.</p>
+    </details>
+
+    <div class="subhead">eBay gotchas — need to know</div>
+    <ul class="gotcha-list">
+      <li><strong>"Free shipping" doesn't lower your fees.</strong> The Final Value Fee applies to (item price + shipping charged) either way, so offering free shipping just moves the cost into the item price — the total money changing hands, and the fee on it, stays the same.</li>
+      <li><strong>You're fee'd on the sales tax too.</strong> eBay's "total amount of the sale" — the base the Final Value Fee is calculated on — includes any sales tax collected, even though that tax isn't yours; eBay collects and remits it on your behalf in most states.</li>
+      <li><strong>A bad month's penalty is delayed.</strong> Below Standard status is decided on the 20th of the month, and the surcharge doesn't apply until the following calendar month — there's a lag between the behavior and the fee.</li>
+      <li><strong>Listing in two categories charges two insertion fees</strong> for the same listing, and the higher of the two Final Value Fees applies if it sells.</li>
+      <li><strong>Your Store subscription is a fixed monthly bill, not a per-item fee.</strong> This calculator only computes single-item math — it doesn't subtract your Store's monthly cost. Divide that cost across your monthly sales volume yourself to know its true per-item drag.</li>
+      <li><strong>The per-order fee has a real cliff at $10.</strong> A $10.00 order pays $0.30; a $10.01 order pays $0.40.</li>
+      <li><strong>Starter Store ≠ a fee discount.</strong> It gets you more free listings, but the Final Value Fee rate is identical to having no Store at all. The rate only drops at Basic tier and up.</li>
+      <li><strong>Promoted Listings should only be toggled on for attributed sales.</strong> If you enter an ad rate for every calculation regardless of whether that specific sale came from a promoted click, you'll overstate your real fees.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let shippingData = null;
+
+async function loadCategories() {
+  const res = await fetch('/api/categories');
+  const data = await res.json();
+  const catSel = $('category');
+  data.categories.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.key;
+    opt.textContent = c.label + (c.verified ? '' : ' (unverified)');
+    catSel.appendChild(opt);
+  });
+  const tierSel = $('storeTier');
+  data.store_tiers.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.key;
+    opt.textContent = t.label;
+    tierSel.appendChild(opt);
+  });
+  $('lastVerified').textContent = `Fee schedule last verified against eBay: ${data.fee_schedule_last_verified}`;
+}
+
+async function loadFeeStatus() {
+  const res = await fetch('/api/fee-status');
+  const data = await res.json();
+  const banner = $('staleBanner');
+  if (data.pending_review) {
+    const stale = data.pending_review.stale_findings || [];
+    const errs = data.pending_review.fetch_errors || [];
+    let msg = `The weekly fee check flagged something on ${data.pending_review.checked_at}: `;
+    if (stale.length) msg += `${stale.length} fee anchor(s) no longer found verbatim on eBay's page (possible rate change) — check data/pending_fee_updates.json. `;
+    if (errs.length) msg += `${errs.length} source page(s) failed to fetch.`;
+    banner.textContent = msg;
+    banner.style.display = 'block';
+  }
+}
+
+function fmt(n) { return `$${Number(n).toFixed(2)}`; }
+
+async function calculate() {
+  const payload = {
+    category_key: $('category').value,
+    store_tier: $('storeTier').value,
+    sale_price: parseFloat($('salePrice').value) || 0,
+    shipping_charged: parseFloat($('shippingCharged').value) || 0,
+    shipping_cost: parseFloat($('shippingCost').value) || 0,
+    item_cost: parseFloat($('itemCost').value) || 0,
+    other_costs: parseFloat($('otherCosts').value) || 0,
+    is_international: $('isInternational').checked,
+    promoted_pct: parseFloat($('promotedPct').value) || 0,
+    below_standard: $('belowStandard').checked,
+    insertion_fee_override: parseFloat($('insertionFee').value) || 0,
+  };
+  const res = await fetch('/api/calculate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    alert(err.detail || 'Calculation failed');
+    return;
+  }
+  const r = await res.json();
+  $('rRevenue').textContent = fmt(r.revenue);
+  $('rFvf').textContent = fmt(r.fees.final_value_fee);
+  $('rPerOrder').textContent = fmt(r.fees.per_order_fee);
+  $('rIntl').textContent = fmt(r.fees.international_fee);
+  $('rPromoted').textContent = fmt(r.fees.promoted_listings_fee);
+  $('rSurcharge').textContent = fmt(r.fees.below_standard_surcharge);
+  $('rInsertion').textContent = fmt(r.fees.insertion_fee);
+  $('rTotalFees').textContent = fmt(r.fees.total);
+  $('rNet').textContent = fmt(r.net_proceeds);
+  $('rCosts').textContent = fmt(r.total_costs);
+  const profitEl = $('rProfit');
+  profitEl.textContent = fmt(r.profit);
+  profitEl.className = r.profit >= 0 ? 'profit-positive' : 'profit-negative';
+  $('rMargin').textContent = `${r.margin_pct}%`;
+  $('rRoi').textContent = r.roi_pct === null ? '–' : `${r.roi_pct}%`;
+  const flag = $('estimateFlag');
+  if (r.category_rate_estimated) {
+    flag.style.display = 'block';
+    flag.textContent = 'Note: this category has no confirmed rate for the selected store tier — using the general "most categories" rate as an estimate.';
+  } else {
+    flag.style.display = 'none';
+  }
+}
+
+// ---- Shipping estimator ----
+
+async function loadShippingRates() {
+  const res = await fetch('/api/shipping-rates');
+  shippingData = await res.json();
+
+  const zoneSel = $('shipZone');
+  shippingData.zones.forEach(z => {
+    const opt = document.createElement('option');
+    opt.value = z;
+    opt.textContent = `Zone ${z}`;
+    zoneSel.appendChild(opt);
+  });
+  zoneSel.value = 5;
+
+  const serviceSel = $('shipService');
+  Object.entries(shippingData.services).forEach(([key, svc]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = svc.label;
+    serviceSel.appendChild(opt);
+  });
+
+  updateShipInputs();
+}
+
+function updateShipInputs() {
+  const svc = shippingData.services[$('shipService').value];
+  const isZoneWeight = svc.kind === 'zone_weight';
+  $('zipRow').style.display = isZoneWeight ? 'flex' : 'none';
+  $('shipZoneRow').style.display = isZoneWeight ? 'flex' : 'none';
+  $('zoneHelp').style.display = isZoneWeight ? 'block' : 'none';
+  $('shipWeightRow').style.display = (isZoneWeight || svc.kind === 'weight_only') ? 'flex' : 'none';
+  $('shipResult').style.display = 'none';
+  $('zoneAutoNote').style.display = 'none';
+  $('applyShipBtn').style.display = 'none';
+}
+
+// ---- Origin ZIP history (localStorage, client-only -- supports shipping from more than one address) ----
+
+const ORIGIN_HISTORY_KEY = 'ebayFeeCalc.originZipHistory';
+
+function loadOriginZipHistory() {
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem(ORIGIN_HISTORY_KEY) || '[]');
+  } catch (e) { /* ignore corrupt storage */ }
+  const datalist = $('originZipHistory');
+  datalist.innerHTML = '';
+  history.forEach(zip => {
+    const opt = document.createElement('option');
+    opt.value = zip;
+    datalist.appendChild(opt);
+  });
+  if (history.length && !$('originZip').value) {
+    $('originZip').value = history[0];
+  }
+}
+
+function rememberOriginZip(zip) {
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem(ORIGIN_HISTORY_KEY) || '[]');
+  } catch (e) { /* ignore corrupt storage */ }
+  history = [zip, ...history.filter(z => z !== zip)].slice(0, 8);
+  localStorage.setItem(ORIGIN_HISTORY_KEY, JSON.stringify(history));
+  loadOriginZipHistory();
+}
+
+let zoneLookupDebounce = null;
+let zoneLookupSeq = 0;
+
+function handleZipInputChanged() {
+  clearTimeout(zoneLookupDebounce);
+  zoneLookupDebounce = setTimeout(runZoneLookup, 450);
+}
+
+async function runZoneLookup() {
+  const origin = $('originZip').value.trim();
+  const dest = $('destZip').value.trim();
+  const note = $('zoneAutoNote');
+
+  if (!/^\d{5}$/.test(origin) || !/^\d{5}$/.test(dest)) {
+    note.style.display = 'none';
+    return;
+  }
+
+  const seq = ++zoneLookupSeq;
+  note.textContent = 'Looking up your real zone via USPS…';
+  note.style.display = 'block';
+
+  let res;
+  try {
+    res = await fetch(`/api/zone-lookup?origin=${origin}&destination=${dest}`);
+  } catch (e) {
+    if (seq !== zoneLookupSeq) return;
+    note.textContent = 'Could not reach the zone lookup service. Pick a zone manually below.';
+    return;
+  }
+  if (seq !== zoneLookupSeq) return; // a newer lookup superseded this one
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    note.textContent = err.detail || 'Zone lookup failed for that ZIP pair. Pick a zone manually below.';
+    note.style.display = 'block';
+    return;
+  }
+
+  const data = await res.json();
+  if (data.zone === null || data.zone === undefined) {
+    note.textContent = 'USPS did not return a zone for that pair. Pick a zone manually below.';
+    note.style.display = 'block';
+    return;
+  }
+
+  $('shipZone').value = data.zone;
+  let msg = `Zone ${data.zone} for ${origin} → ${dest}`;
+  msg += data.cached ? ' (cached result' : ' (live from USPS';
+  if (data.effective_date) msg += `, chart effective ${data.effective_date}`;
+  msg += ').';
+  if (data.same_ndc_as_origin) msg += ' Same processing network as your origin.';
+  note.textContent = msg;
+  note.style.display = 'block';
+
+  rememberOriginZip(origin);
+  estimateShipping();
+}
+
+function nearestBracketIndex(brackets, weight) {
+  for (let i = 0; i < brackets.length; i++) {
+    if (weight <= brackets[i]) return i;
+  }
+  return brackets.length - 1;
+}
+
+function estimateShipping() {
+  const svc = shippingData.services[$('shipService').value];
+  const resultEl = $('shipResult');
+  const applyBtn = $('applyShipBtn');
+
+  if (svc.kind === 'estimate_only') {
+    resultEl.innerHTML = svc.note;
+    resultEl.style.display = 'block';
+    applyBtn.style.display = 'none';
+    return null;
+  }
+
+  if (svc.kind === 'flat') {
+    resultEl.innerHTML = `<span class="price">${fmt(svc.price)}</span> flat rate, any weight up to the carrier's max for this box/envelope.`;
+    resultEl.style.display = 'block';
+    applyBtn.style.display = 'block';
+    return svc.price;
+  }
+
+  const weight = parseFloat($('shipWeight').value) || 0;
+
+  if (svc.kind === 'weight_only') {
+    const idx = nearestBracketIndex(svc.weight_brackets_lb, weight);
+    const price = svc.rates[idx];
+    resultEl.innerHTML = `<span class="price">${fmt(price)}</span> for up to ${svc.weight_brackets_lb[idx]} lb.`;
+    resultEl.style.display = 'block';
+    applyBtn.style.display = 'block';
+    return price;
+  }
+
+  if (svc.kind === 'zone_weight') {
+    const zone = $('shipZone').value;
+    const rates = svc.rates_by_zone[zone];
+    if (!rates) {
+      resultEl.innerHTML = `No data for zone ${zone} for this service.`;
+      resultEl.style.display = 'block';
+      applyBtn.style.display = 'none';
+      return null;
+    }
+    const idx = nearestBracketIndex(svc.weight_brackets_lb, weight);
+    const price = rates[idx];
+    resultEl.innerHTML = `<span class="price">${fmt(price)}</span> for up to ${svc.weight_brackets_lb[idx]} lb, Zone ${zone}.` + (svc.note ? ` <br>${svc.note}` : '');
+    resultEl.style.display = 'block';
+    applyBtn.style.display = 'block';
+    return price;
+  }
+
+  return null;
+}
+
+$('shipService').addEventListener('change', updateShipInputs);
+$('shipZone').addEventListener('change', estimateShipping);
+$('shipWeight').addEventListener('input', estimateShipping);
+$('shipService').addEventListener('change', estimateShipping);
+$('originZip').addEventListener('input', handleZipInputChanged);
+$('destZip').addEventListener('input', handleZipInputChanged);
+$('applyShipBtn').addEventListener('click', () => {
+  const price = estimateShipping();
+  if (price !== null) {
+    $('shippingCost').value = price.toFixed(2);
+    calculate();
+  }
+});
+
+$('calcBtn').addEventListener('click', calculate);
+loadCategories().then(calculate);
+loadFeeStatus();
+loadShippingRates();
+loadOriginZipHistory();
+</script>
+</body>
+</html>

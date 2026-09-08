@@ -1,0 +1,9 @@
+services:
+  ebay-fee-calculator:
+    build: .
+    container_name: ebay-fee-calculator
+    restart: unless-stopped
+    ports:
+      - "8341:8000" # host:container -- change the host side (left) to whatever port you want
+    volumes:
+      - ./data:/app/data

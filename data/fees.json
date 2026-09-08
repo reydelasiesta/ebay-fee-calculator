@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "last_verified": "2026-09-06",
+    "source_urls": [
+      "https://www.ebay.com/help/selling/fees-credits-invoices/selling-fees?id=4822",
+      "https://www.ebay.com/help/selling/selling-fees/store-fees?id=4809"
+    ],
+    "notes": "Rebuilt 2026-09-06 directly from eBay's own page text (fetched with requests+BeautifulSoup, not an AI paraphrase) so every anchor_text below is a genuine verbatim substring of the live page -- the fee_checker's exact-match test only works if that holds. Categories marked verified:false, or with a null tier, aren't individually broken out by eBay for that tier and fall back to the 'most_categories' rate as a labeled estimate. Categories not modeled at all (most of eBay's long tail) also fall back to 'most_categories' -- see README for the full list of what's covered."
+  },
+  "per_order_fee": {
+    "threshold": 10.00,
+    "at_or_below": 0.30,
+    "above": 0.40,
+    "anchor_text": "For orders $10.00 or less the per order fee is $0.30, for orders over $10.00 the per order fee is $0.40"
+  },
+  "international_fee_pct": 1.65,
+  "international_fee_anchor_text": "This fee is calculated as 1.65% of the total amount of the sale",
+  "insertion_fee": {
+    "free_per_month_default": 250,
+    "after_free": 0.35,
+    "anchor_text": "First 250 listings free per month, then $0.35 per listing"
+  },
+  "below_standard_surcharge_pct": {
+    "standard": 6,
+    "after_4_consecutive_months": 7,
+    "anchor_text": "you'll be charged an additional 6% on the final value fees applicable to sales in the following calendar month"
+  },
+  "store_tiers": [
+    {"key": "none", "label": "No Store"},
+    {"key": "starter", "label": "Starter Store (same FVF rate as no store)"},
+    {"key": "basic_plus", "label": "Basic / Premium / Anchor / Enterprise Store"}
+  ],
+  "categories": {
+    "most_categories": {
+      "label": "Most categories (general merchandise, Home & Garden, Crafts, Dolls & Bears, etc.) -- the catch-all rate",
+      "verified": true,
+      "none": {"brackets": [{"upto": 7500, "pct": 13.6}, {"upto": null, "pct": 2.35}], "anchor_text": "13.6% on total amount of the sale up to $7,500 calculated per item"},
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 12.7}, {"upto": null, "pct": 2.35}], "anchor_text": "12.7% on total amount of the sale up to $2,500 calculated per item"}
+    },
+    "books_movies_music": {
+      "label": "Books & Magazines, Movies & TV, Music",
+      "verified": true,
+      "none": {"brackets": [{"upto": 7500, "pct": 15.3}, {"upto": null, "pct": 2.35}], "anchor_text": "15.3% on total amount of the sale up to $7,500 calculated per item"},
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 15.3}, {"upto": null, "pct": 2.35}], "anchor_text": "15.3% on total amount of the sale up to $2,500 calculated per item"}
+    },
+    "coins_paper_money": {
+      "label": "Coins & Paper Money (except Bullion)",
+      "verified": true,
+      "none": {"brackets": [{"upto": 7500, "pct": 13.25}, {"upto": null, "pct": 2.35}], "anchor_text": "Coins & Paper Money (except Bullion) 13.25% on total amount of the sale up to $7,500"},
+      "basic_plus": {"brackets": [{"upto": 4000, "pct": 9}, {"upto": null, "pct": 2.35}], "anchor_text": "Most Coins & Paper Money categories, except: 9% on total amount of the sale up to $4,000"}
+    },
+    "bullion": {
+      "label": "Coins & Paper Money > Bullion",
+      "verified": true,
+      "none": {"brackets": [{"upto": 7500, "pct": 13.6}, {"upto": null, "pct": 7}], "anchor_text": "Coins & Paper Money > Bullion 13.6% if total amount of the sale is $7,500 or less"},
+      "basic_plus": {"brackets": [{"upto": 1500, "pct": 7.5}, {"upto": 10000, "pct": 5}, {"upto": null, "pct": 4.5}], "anchor_text": "Bullion 7.5% if total amount of the sale is $1,500 or less"}
+    },
+    "trading_cards_collectibles": {
+      "label": "Sports/Non-Sport Trading Cards, Comic Books & Memorabilia, Collectible Card Games (non-NFT)",
+      "verified": true,
+      "none": {"brackets": [{"upto": 7500, "pct": 13.25}, {"upto": null, "pct": 2.35}], "anchor_text": "Comic Books & Memorabilia Non-Sport Trading Cards Sports Mem, Cards & Fan Shop > Sports Trading Cards Toys & Hobbies > Collectible Card Games 13.25% on total amount of the sale up to $7,500"},
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 12.35}, {"upto": null, "pct": 2.35}], "anchor_text": "Sports Trading Cards (except Sport Trading Card NFTs) 12.35% on total amount of the sale up to $2,500"}
+    },
+    "guitars": {
+      "label": "Musical Instruments & Gear > Guitars & Basses",
+      "verified": true,
+      "none": {"brackets": [{"upto": 7500, "pct": 6.7}, {"upto": null, "pct": 2.35}], "anchor_text": "Guitars & Basses 6.7% on total amount of the sale up to $7,500"},
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 6.7}, {"upto": null, "pct": 2.35}], "anchor_text": "Guitars & Basses 6.7% on total amount of the sale up to $2,500"}
+    },
+    "jewelry_watches": {
+      "label": "Jewelry & Watches (except Watches, Parts & Accessories)",
+      "verified": true,
+      "none": {"brackets": [{"upto": 5000, "pct": 15}, {"upto": null, "pct": 9}], "anchor_text": "Jewelry & Watches (except Watches, Parts & Accessories) 15% if total amount of the sale is $5,000 or less"},
+      "basic_plus": {"brackets": [{"upto": 5000, "pct": 13}, {"upto": null, "pct": 7}], "anchor_text": "Most Jewelry & Watches categories, except: 13% if total amount of the sale is $5,000 or less"}
+    },
+    "watches_parts": {
+      "label": "Jewelry & Watches > Watches, Parts & Accessories",
+      "verified": true,
+      "none": {"brackets": [{"upto": 1000, "pct": 15}, {"upto": 7500, "pct": 6.5}, {"upto": null, "pct": 3}], "anchor_text": "Watches, Parts & Accessories 15% on total amount of the sale up to $1,000"},
+      "basic_plus": {"brackets": [{"upto": 1000, "pct": 12.5}, {"upto": 5000, "pct": 4}, {"upto": null, "pct": 3}], "anchor_text": "Watches, Parts & Accessories 12.5% on total amount of the sale up to $1,000"}
+    },
+    "handbags": {
+      "label": "Clothing, Shoes & Accessories > Women's Bags & Handbags",
+      "verified": true,
+      "none": {"brackets": [{"upto": 2000, "pct": 15}, {"upto": null, "pct": 9}], "anchor_text": "Women's Bags & Handbags 15% if total amount of the sale is $2,000 or less"},
+      "basic_plus": {"brackets": [{"upto": 2000, "pct": 13}, {"upto": null, "pct": 7}], "anchor_text": "Women's Bags & Handbags 13% if total amount of the sale is $2,000 or less"}
+    },
+    "nft": {
+      "label": "NFT categories (Art, CCG, Emerging, Movie, Music, Non-Sport/Sport Trading Card NFTs)",
+      "verified": true,
+      "none": {"brackets": [{"upto": null, "pct": 5}], "anchor_text": "Sport Trading Card NFTs 5% on total amount of the sale"},
+      "basic_plus": {"brackets": [{"upto": null, "pct": 5}], "anchor_text": "Art NFTs 5% on total amount of the sale"}
+    },
+    "business_industrial_select": {
+      "label": "Select Business & Industrial: Heavy Equipment Parts, Commercial Printing Presses, Food Trucks/Trailers/Carts",
+      "verified": true,
+      "none": {"brackets": [{"upto": 15000, "pct": 3}, {"upto": null, "pct": 0.5}], "anchor_text": "Restaurant & Food Service > Food Trucks, Trailers & Carts 3% on total amount of the sale up to $15,000"},
+      "basic_plus": {"brackets": [{"upto": 15000, "pct": 2.5}, {"upto": null, "pct": 0.5}], "anchor_text": "Restaurant & Food Service > Food Trucks, Trailers & Carts 2.5% on total amount of the sale up to $15,000"}
+    },
+    "athletic_shoes_150plus": {
+      "label": "Athletic Shoes (starting price $150 or more)",
+      "verified": true,
+      "no_per_order_fee": true,
+      "none": {"brackets": [{"upto": null, "pct": 8}], "anchor_text": "8% if total amount of the sale is $150 or more. The per order fee is not charged 13.6% if total amount of the sale is less than $150"},
+      "basic_plus": {"brackets": [{"upto": null, "pct": 7}], "anchor_text": "7% if total amount of the sale is $150 or more, calculated per item. The per order fee is not charged 12.7% if total amount of the sale is less than $150"}
+    },
+    "athletic_shoes_under150": {
+      "label": "Athletic Shoes (starting price under $150)",
+      "verified": true,
+      "none": {"brackets": [{"upto": 7500, "pct": 13.6}, {"upto": null, "pct": 2.35}], "anchor_text": "8% if total amount of the sale is $150 or more. The per order fee is not charged 13.6% if total amount of the sale is less than $150"},
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 12.7}, {"upto": null, "pct": 2.35}], "anchor_text": "7% if total amount of the sale is $150 or more, calculated per item. The per order fee is not charged 12.7% if total amount of the sale is less than $150"}
+    },
+    "electronics_devices": {
+      "label": "Cameras, Cell Phones (the phones themselves), Computers/Tablets, Consumer Electronics -- main devices only, not accessories",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 9.35}, {"upto": null, "pct": 2.35}], "anchor_text": "Most Cameras & Photo categories, except: 9.35% on total amount of the sale up to $2,500"}
+    },
+    "computer_components": {
+      "label": "Computer Components & Parts: CPUs, RAM, Motherboards, HDD/SSD/NAS Drives, Monitors, Printers",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 7.35}, {"upto": null, "pct": 2.35}], "anchor_text": "Monitors, Projectors & Accs > Monitors Printers, Scanners & Supplies > Printers 7.35% on total amount of the sale up to $2,500"}
+    },
+    "dj_pro_audio": {
+      "label": "Musical Instruments & Gear: DJ Equipment, Pro Audio Equipment",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 9.35}, {"upto": null, "pct": 2.35}], "anchor_text": "DJ Equipment Pro Audio Equipment 9.35% on total amount of the sale up to $2,500"}
+    },
+    "musical_instruments_other": {
+      "label": "Musical Instruments & Gear (most, except DJ/Pro Audio Equipment and Guitars & Basses)",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 10.35}, {"upto": null, "pct": 2.35}], "anchor_text": "Most Musical Instruments & Gear categories, except: 10.35% on total amount of the sale up to $2,500"}
+    },
+    "stamps": {
+      "label": "Stamps",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 9.7}, {"upto": null, "pct": 2.35}], "anchor_text": "Stamps 9.7% on total amount of the sale up to $2,500"}
+    },
+    "ebay_motors_general": {
+      "label": "eBay Motors: Automotive Tools & Supplies, Parts & Accessories (general), Safety & Security Accessories",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 1000, "pct": 11.5}, {"upto": null, "pct": 2.35}], "anchor_text": "Safety & Security Accessories 11.5% on total amount of the sale up to $1,000"}
+    },
+    "ebay_motors_tires": {
+      "label": "eBay Motors > Parts & Accessories: Tires (Car/Truck, ATV/UTV, Motorcycle, RV/Trailer, Performance, Golf Cart, Aviation, Commercial Truck)",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 1000, "pct": 9.5}, {"upto": null, "pct": 2.35}], "anchor_text": "Commercial Truck Parts > Wheels & Tires > Tires 9.5% on total amount of the sale up to $1,000"}
+    },
+    "ebay_motors_apparel_protective": {
+      "label": "eBay Motors > Parts & Accessories > Apparel, Protective Gear & Merchandise",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 1000, "pct": 12.7}, {"upto": null, "pct": 2.35}], "anchor_text": "Apparel, Protective Gear & Merchandise 12.7% on total amount of the sale up to $1,000"}
+    },
+    "ebay_motors_incar_tech": {
+      "label": "eBay Motors > Parts & Accessories > In-Car Technology, GPS & Security",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 1000, "pct": 9.35}, {"upto": null, "pct": 2.35}], "anchor_text": "In-Car Technology, GPS & Security 9.35% on total amount of the sale up to $1,000"}
+    },
+    "video_game_consoles": {
+      "label": "Video Games & Consoles > Video Game Consoles",
+      "verified": true,
+      "none": null,
+      "basic_plus": {"brackets": [{"upto": 2500, "pct": 7.35}, {"upto": null, "pct": 2.35}], "anchor_text": "Video Game Consoles 7.35% on total amount of the sale up to $2,500"}
+    }
+  }
+}
