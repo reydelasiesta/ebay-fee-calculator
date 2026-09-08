@@ -3,6 +3,10 @@
 Self-hosted single-item eBay fee/profit calculator. Runs as one Docker container,
 no external accounts, API keys, or paid services required.
 
+![Calculator with fee breakdown, profit, and the explanations/gotchas panel](docs/screenshot.jpg)
+
+![Shipping estimator auto-detecting a real USPS zone from a live lookup](docs/zone-lookup.jpg)
+
 ## What it calculates
 
 Given a sale price, shipping charged/paid, item cost, and a few optional toggles
